@@ -1,0 +1,36 @@
+name: Sync To Hetzner
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on:
+      - self-hosted
+      - Linux
+      - X64
+    concurrency:
+      group: sync-agent-robin-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ensure target directory
+        run: mkdir -p /home/samora/apps/agent-robin
+
+      - name: Sync repo to Hetzner app directory
+        run: |
+          rsync -a --delete \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude 'node_modules' \
+            --exclude '.env' \
+            --exclude '.pnpm-store' \
+            --exclude '.turbo' \
+            ./ /home/samora/apps/agent-robin/
+
+      - name: Record synced commit
+        run: git rev-parse HEAD > /home/samora/apps/agent-robin/.deploy-commit
