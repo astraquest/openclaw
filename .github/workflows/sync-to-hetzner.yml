@@ -34,3 +34,6 @@ jobs:
 
       - name: Record synced commit
         run: git rev-parse HEAD > /home/samora/apps/agent-robin/.deploy-commit
+
+      - name: Deploy app
+        run: /home/samora/bin/deploy-agent-robin.sh
